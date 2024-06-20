@@ -37,13 +37,17 @@ Cite us if you use our model, code or data:
 - [17-06-2020] Inference script and female old-t-shirt weights added.
 
 ## Requirements
-python3  
-pytorch  
-scipy  
-[chumpy](https://github.com/mattloper/chumpy)  
-[psbody.mesh](https://github.com/MPI-IS/mesh)
+Code works with python3, pytorch >= v1.0, scipy v1.3, [chumpy v0.7](https://github.com/mattloper/chumpy) and [psbody.mesh v0.4](https://github.com/MPI-IS/mesh).
 
-Code works with psbody.mesh v0.4 , pytorch >= v1.0 , chumpy v0.7 and scipy v1.3 .
+```shell
+conda create -n TailorNet python=3.8
+conda activate TailorNet
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+conda install -c conda-forge scipy=1.3
+pip install chumpy==0.70
+```
+
+To install psbody.mesh, refer to [README](https://github.com/NagabhushanSN24/mpi-is-mesh?tab=readme-ov-file#installation).
 
 ## How to Run
 - Download and prepare SMPL model and TailorNet data from [dataset repository](https://github.com/zycliao/TailorNet_dataset).
