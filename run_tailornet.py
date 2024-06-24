@@ -15,7 +15,7 @@ from visualization.vis_utils import get_specific_shape, get_amass_sequence_theta
 from utils.interpenetration import remove_interpenetration_fast
 
 # Set output path where inference results will be stored
-OUT_PATH = "/BS/cpatel/work/code_test2"
+OUT_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004"
 
 
 def get_single_frame_inputs(garment_class, gender):
@@ -73,7 +73,7 @@ def get_sequence_inputs(garment_class, gender):
 
 def run_tailornet():
     gender = 'female'
-    garment_class = 'skirt'
+    garment_class = 'short-pant'
     thetas, betas, gammas = get_single_frame_inputs(garment_class, gender)
     # # uncomment the line below to run inference on sequence data
     # thetas, betas, gammas = get_sequence_inputs(garment_class, gender)
@@ -101,8 +101,11 @@ def run_tailornet():
             )[0].cpu().numpy()
 
         # get garment from predicted displacements
-        body, pred_gar = smpl.run(beta=beta, theta=theta, garment_class=garment_class, garment_d=pred_verts_d)
+        body, pred_gar, body_gar = smpl.run(beta=beta, theta=theta, garment_class=garment_class, garment_d=pred_verts_d)
         pred_gar = remove_interpenetration_fast(pred_gar, body)
+
+        np.save(f'vertices_{gender}_{garment_class}_{i:02}_garment.npy', pred_gar.v)
+        np.save(f'vertices_{gender}_{garment_class}_{i:02}_body_garment.npy', body_gar.v)
 
         # save body and predicted garment
         body.write_ply(os.path.join(OUT_PATH, "body_{:04d}.ply".format(i)))

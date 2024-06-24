@@ -56,9 +56,10 @@ class SMPL4Garment(object):
                 garment_m = Mesh(v=verts, f=f)
         else:
             garment_m = None
+        body_garment_m = Mesh(v=self.smpl_base.r, f=self.smpl_base.f)
         self.smpl_base.v_personal[:] = 0
         body_m = Mesh(v=self.smpl_base.r, f=self.smpl_base.f)
-        return body_m, garment_m
+        return body_m, garment_m, body_garment_m
 
 
 if __name__ == '__main__':
