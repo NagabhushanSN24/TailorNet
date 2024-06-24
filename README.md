@@ -44,7 +44,14 @@ conda create -n TailorNet python=3.8
 conda activate TailorNet
 conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 conda install -c conda-forge scipy=1.3
+conda install -c conda-forge scikit-learn
 pip install chumpy==0.70
+pip install tensorboardX
+```
+
+If you get an error saying `numpy` has no attribute `bool`, install a previous version of `numpy`
+```bash
+pip3 install mxnet-mkl==1.6.0 numpy==1.23.1
 ```
 
 To install psbody.mesh, refer to [README](https://github.com/NagabhushanSN24/mpi-is-mesh?tab=readme-ov-file#installation).
@@ -72,6 +79,20 @@ To install psbody.mesh, refer to [README](https://github.com/NagabhushanSN24/mpi
 - Set output path in `run_tailornet.py` and run it to predict garments on some random inputs. You can play with 
   different inputs. You can also run inference on motion sequence data.
 - To visualize predicted garment using blender, run `python run_tailornet.py render`. (Blender 2.79 needs to be installed.)
+
+### Installing Blender
+Download the blender tar file and extract it
+```shell
+cd $HOME/softwares
+mkdir Blender
+cd Blender
+wget https://download.blender.org/release/Blender2.79/blender-2.79-linux-glibc219-x86_64.tar.bz2
+tar -xvf blender-2.79-linux-glibc219-x86_64.tar.bz2
+```
+Add the blender path to `$PATH` environment variable
+```shell
+export PATH=$PATH:$HOME/softwares/Blender/blender-2.79-linux-glibc219-x86_64/
+```
 
 ## TailorNet Per-vertex Error in mm on Test Set
 ... evaluated using `evaluate` function in `utils/eval.py`.
