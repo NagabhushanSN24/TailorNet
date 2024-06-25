@@ -91,6 +91,7 @@ def run_tailornet():
     # make out directory if doesn't exist
     if not os.path.isdir(OUT_PATH):
         os.mkdir(OUT_PATH)
+        os.mkdir(os.path.join(OUT_PATH, 'model_data'))
 
     # run inference
     for i, (theta, beta, gamma) in enumerate(zip(thetas, betas, gammas)):
