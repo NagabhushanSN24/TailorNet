@@ -15,7 +15,7 @@ from visualization.vis_utils import get_specific_shape, get_amass_sequence_theta
 from utils.interpenetration import remove_interpenetration_fast
 
 # Set output path where inference results will be stored
-OUT_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0005"
+OUT_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0002"
 
 
 def get_single_frame_inputs(garment_class, gender):

@@ -11,7 +11,7 @@ SMPL_PATH_MALE = '/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/cl
 SMPL_PATH_FEMALE = '/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/TailorNet_dataset/data/smpl/models/basicModel_f_lbs_10_207_0_v1.0.0.pkl'
 
 # Log directory where training logs, checkpoints and visualizations will be stored
-LOG_DIR = '/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0005/logs'
+LOG_DIR = '/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0002/logs'
 
 # Downloaded TailorNet trained models' path
 MODEL_WEIGHTS_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/TailorNet/data/model_weights"
