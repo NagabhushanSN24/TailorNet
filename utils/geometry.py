@@ -170,15 +170,18 @@ def get_boundary_verts(verts, faces, connected_boundaries=True, connected_faces=
 def loop_subdivider(mesh_v, mesh_f):
     """Copied from opendr and modified to work in python3."""
 
-    IS = []
-    JS = []
-    data = []
+    IS = []  # len(IS) = 130886 = 6890*7+20664*4
+    JS = []  # same length as IS
+    data = []  # same length as IS
 
+    # vc: 6890x6890 matrix: 1 if vertices are connected, 0 else.
     vc = get_vert_connectivity(mesh_v, mesh_f)
+    # ve: 20664x2 matrix: 20664 is the number of edges in SMPL mesh; contains indices of the connected vertices for every edge
     ve = get_vertices_per_edge(mesh_v, mesh_f)
+    # vo: dict with 20664 elements. Keys are the edges. Each value is a list of vertices opposite to the corresponding edge. Every edge can have maximum two opposite vertices.
     vo = get_vert_opposites_per_edge(mesh_v, mesh_f)
 
-    if True:
+    if True:  # IS: index of mesh vertex; JS: all neighbors of corresponding vertex
         # New values for each vertex
         for idx in range(len(mesh_v)):
 
@@ -206,9 +209,9 @@ def loop_subdivider(mesh_v, mesh_f):
             data.append(1. - (wt * nn))
 
     start = len(mesh_v)
-    edge_to_midpoint = {}
+    edge_to_midpoint = {}  # dict of length 41328(=20664*2); key: edge vertices; value: index of edge in IS.
 
-    if True:
+    if True:  # IS: edge index, starts at 6890; JS: indices of endpoint and opposite vertices of each edge.
         # New values for each edge:
         # new edge verts depend on the verts they span
         for idx, vs in enumerate(ve):
@@ -231,7 +234,9 @@ def loop_subdivider(mesh_v, mesh_f):
             edge_to_midpoint[(vsl[0], vsl[1])] = start + idx
             edge_to_midpoint[(vsl[1], vsl[0])] = start + idx
 
-    f = []
+    # f: ((index of edge1 in IS, vertex, index of edge2 in IS) for every edge + indices of every edge in IS) for the face
+    # len(f) = 55104 = 13776 * 4
+    f = [];
 
     for f_i, old_f in enumerate(mesh_f):
         ff = np.concatenate((old_f, old_f))
@@ -257,8 +262,8 @@ def loop_subdivider(mesh_v, mesh_f):
         JS = np.concatenate((JS*3, JS*3+1, JS*3+2))
         data = np.concatenate ((data,data,data))
 
-    ij = np.vstack((IS.flatten(), JS.flatten()))
-    mtx = sp.csc_matrix((data, ij))
+    ij = np.vstack((IS.flatten(), JS.flatten()))  # (2, 392622)
+    mtx = sp.csc_matrix((data, ij))  # (82662, 20670)
 
     return mtx, f
 

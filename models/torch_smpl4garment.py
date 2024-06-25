@@ -5,6 +5,7 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import pickle
+from psbody.mesh import Mesh
 
 import global_var
 from utils.smpl_paths import SmplPaths
@@ -34,26 +35,26 @@ class TorchSMPL4Garment(nn.Module):
 
         np_v_template = np.array(model['v_template'], dtype=np.float)
 
-        self.register_buffer('v_template', torch.from_numpy(np_v_template).float())
+        self.register_buffer('v_template', torch.from_numpy(np_v_template).float().cuda())
         self.size = [np_v_template.shape[0], 3]
 
         np_shapedirs = np.array(model['shapedirs'], dtype=np.float)[:, :, :10]
         self.num_betas = np_shapedirs.shape[-1]
         np_shapedirs = np.reshape(np_shapedirs, [-1, self.num_betas]).T
-        self.register_buffer('shapedirs', torch.from_numpy(np_shapedirs).float())
+        self.register_buffer('shapedirs', torch.from_numpy(np_shapedirs).float().cuda())
 
         np_J_regressor = np.array(model['J_regressor'].todense(), dtype=np.float).T
-        self.register_buffer('J_regressor', torch.from_numpy(np_J_regressor).float())
+        self.register_buffer('J_regressor', torch.from_numpy(np_J_regressor).float().cuda())
 
         np_posedirs = np.array(model['posedirs'], dtype=np.float)
         num_pose_basis = np_posedirs.shape[-1]
         np_posedirs = np.reshape(np_posedirs, [-1, num_pose_basis]).T
-        self.register_buffer('posedirs', torch.from_numpy(np_posedirs).float())
+        self.register_buffer('posedirs', torch.from_numpy(np_posedirs).float().cuda())
 
         self.parents = np.array(model['kintree_table'])[0].astype(np.int32)
 
         np_joint_regressor = np.array(model['J_regressor'].todense(), dtype=np.float)
-        self.register_buffer('joint_regressor', torch.from_numpy(np_joint_regressor).float())
+        self.register_buffer('joint_regressor', torch.from_numpy(np_joint_regressor).float().cuda())
 
         np_weights = np.array(model['weights'], dtype=np.float)
 
@@ -62,16 +63,16 @@ class TorchSMPL4Garment(nn.Module):
 
         self.register_buffer(
             'weight',
-            torch.from_numpy(np_weights).float().reshape(1, vertex_count, vertex_component))
+            torch.from_numpy(np_weights).float().reshape(1, vertex_count, vertex_component).cuda())
 
-        self.register_buffer('e3', torch.eye(3).float())
+        self.register_buffer('e3', torch.eye(3).float().cuda())
         self.cur_device = None
         self.num_verts = 27554
 
         skirt_weight = np.load(os.path.join(global_var.DATA_DIR, 'skirt_weight.npz'))['w']
-        self.register_buffer('skirt_weight', torch.from_numpy(skirt_weight).float())
+        self.register_buffer('skirt_weight', torch.from_numpy(skirt_weight).float().cuda())
         skirt_skinning = skirt_weight.dot(np_weights)
-        self.register_buffer('skirt_skinning', torch.from_numpy(skirt_skinning).float())
+        self.register_buffer('skirt_skinning', torch.from_numpy(skirt_skinning).float().cuda())
 
     def save_obj(self, verts, obj_mesh_name):
         if self.faces is None:
@@ -92,6 +93,7 @@ class TorchSMPL4Garment(nn.Module):
             self.cur_device = torch.device(device.type, device.index)
 
         num_batch = theta.shape[0]
+        num_batch = 1
 
         if beta is not None:
             v_shaped = torch.matmul(
@@ -145,7 +147,11 @@ class TorchSMPL4Garment(nn.Module):
                 torch.ones(num_batch, v_deformed.shape[1], 1, device=self.cur_device)], dim=2)
             v_homo = torch.matmul(T, torch.unsqueeze(v_posed_homo, -1))
             v_garment = v_homo[:, :, :3, 0]
-            return v_body, v_garment[:, self.class_info[garment_class]['vert_indices']]
+            f_garment = self.class_info[garment_class]['f']
+            body_m = Mesh(v=v_body.detach().cpu().numpy()[0], f=self.faces)
+            garment_m = Mesh(v=v_garment.detach().cpu().numpy()[0, self.class_info[garment_class]['vert_indices'].detach().cpu().numpy()], f=f_garment.detach().cpu().numpy())
+            body_garment_m = Mesh(v=v_garment.detach().cpu().numpy()[0], f=self.faces)
+            return body_m, garment_m, body_garment_m
         else:
             return v_body
 

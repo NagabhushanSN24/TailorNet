@@ -15,7 +15,7 @@ def get_hres(v, f):
     from .geometry import loop_subdivider
     (mapping, nf) = loop_subdivider(v, f)
     nv = mapping.dot(v.ravel()).reshape(-1, 3)
-    return (nv, nf, mapping)
+    return (nv, nf, mapping)  # 27554 vertices, 55104 faces
 
 
 # smpl_vt_ft_path = '/BS/bharat/work/MGN_final_release/assets/smpl_vt_ft.pkl'
@@ -43,17 +43,17 @@ class SmplPaths:
 
     def get_hres_smpl_model_data(self):
 
-        dd = pkl.load(open(self.get_smpl_file(), 'rb'), encoding='latin1')
+        dd = pkl.load(open(self.get_smpl_file(), 'rb'), encoding='latin1')  # 6890 vertices, 20670 edges, 13776 faces
         backwards_compatibility_replacements(dd)
 
-        hv, hf, mapping = get_hres(dd['v_template'], dd['f'])
+        hv, hf, mapping = get_hres(dd['v_template'], dd['f'])  # 27554 vertices, 55104 faces
 
-        num_betas = dd['shapedirs'].shape[-1]
-        J_reg = dd['J_regressor'].asformat('csr')
+        num_betas = dd['shapedirs'].shape[-1]  # 10
+        J_reg = dd['J_regressor'].asformat('csr')  # (24, 6890) sparse matrix
 
         model = {
-            'v_template': hv,
-            'weights': np.hstack([
+            'v_template': hv,  # (27554, 3)
+            'weights': np.hstack([  # (27554, 24)
                 np.expand_dims(
                     np.mean(
                         mapping.dot(np.repeat(np.expand_dims(dd['weights'][:, i], -1), 3)).reshape(-1, 3)
@@ -61,14 +61,14 @@ class SmplPaths:
                     axis=-1)
                 for i in range(24)
             ]),
-            'posedirs': mapping.dot(dd['posedirs'].reshape((-1, 207))).reshape(-1, 3, 207),
-            'shapedirs': mapping.dot(dd['shapedirs'].reshape((-1, num_betas))).reshape(-1, 3, num_betas),
-            'J_regressor': sp.csr_matrix((J_reg.data, J_reg.indices, J_reg.indptr), shape=(24, hv.shape[0])),
-            'kintree_table': dd['kintree_table'],
-            'bs_type': dd['bs_type'],
-            'bs_style': dd['bs_style'],
-            'J': dd['J'],
-            'f': hf,
+            'posedirs': mapping.dot(dd['posedirs'].reshape((-1, 207))).reshape(-1, 3, 207),  # (27554, 3, 207)
+            'shapedirs': mapping.dot(dd['shapedirs'].reshape((-1, num_betas))).reshape(-1, 3, num_betas),  # (27554, 3, 10)
+            'J_regressor': sp.csr_matrix((J_reg.data, J_reg.indices, J_reg.indptr), shape=(24, hv.shape[0])),  # (24, 27554)
+            'kintree_table': dd['kintree_table'],  # (2, 24)
+            'bs_type': dd['bs_type'],  # lrotmin
+            'bs_style': dd['bs_style'],  # lbs
+            'J': dd['J'],  # (24, 3)
+            'f': hf,  # (55104, 3)
         }
 
         return model

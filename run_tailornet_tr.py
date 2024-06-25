@@ -5,7 +5,7 @@ import torch
 from psbody.mesh import Mesh
 
 from models.tailornet_model import get_best_runner as get_tn_runner
-from models.smpl4garment import SMPL4Garment
+from models.torch_smpl4garment import TorchSMPL4Garment as SMPL4Garment
 from utils.rotation import normalize_y_rotation
 from visualization.blender_renderer import visualize_garment_body
 
@@ -15,7 +15,7 @@ from visualization.vis_utils import get_specific_shape, get_amass_sequence_theta
 from utils.interpenetration import remove_interpenetration_fast
 
 # Set output path where inference results will be stored
-OUT_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004"
+OUT_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0005"
 
 
 def get_single_frame_inputs(garment_class, gender):
@@ -93,15 +93,19 @@ def run_tailornet():
         print(i, len(thetas))
         # normalize y-rotation to make it front facing
         theta_normalized = normalize_y_rotation(theta)
+        theta = torch.from_numpy(theta.astype(np.float32)).cuda()
+        theta_normalized = torch.from_numpy(theta_normalized.astype(np.float32)).cuda()
+        beta = torch.from_numpy(beta.astype(np.float32)).cuda()
+        gamma = torch.from_numpy(gamma.astype(np.float32)).cuda()
         with torch.no_grad():
             pred_verts_d = tn_runner.forward(
-                thetas=torch.from_numpy(theta_normalized[None, :].astype(np.float32)).cuda(),
-                betas=torch.from_numpy(beta[None, :].astype(np.float32)).cuda(),
-                gammas=torch.from_numpy(gamma[None, :].astype(np.float32)).cuda(),
-            )[0].cpu().numpy()
+                thetas=theta_normalized[None, :],
+                betas=beta[None, :],
+                gammas=gamma[None, :],
+            )[0].cuda()
 
         # get garment from predicted displacements
-        body, pred_gar, body_gar = smpl.run(beta=beta, theta=theta, garment_class=garment_class, garment_d=pred_verts_d)
+        body, pred_gar, body_gar = smpl(beta=beta, theta=theta, garment_class=garment_class, garment_d=pred_verts_d)
         pred_gar = remove_interpenetration_fast(pred_gar, body)
 
         np.save(f'vertices_{gender}_{garment_class}_{i:02}_garment.npy', pred_gar.v)
