@@ -42,9 +42,9 @@ def find_closest_vertices(x: numpy.ndarray):
 def main():
     show_vertex_index = False
 
-    person_index = 0
-    vertices_body = numpy.load(f'/Users/nagabhushan/SpreeAI/Research/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/vertices_female_short-pant_{person_index:02}_body_garment.npy')
-    vertices_cloth = numpy.load(f'/Users/nagabhushan/SpreeAI/Research/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/vertices_female_short-pant_{person_index:02}_garment.npy')
+    person_index = 24
+    vertices_body = numpy.load(f'/Users/nagabhushan/SpreeAI/Research/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_female_short-pant_{person_index:02}_body_garment.npy')
+    vertices_cloth = numpy.load(f'/Users/nagabhushan/SpreeAI/Research/01_SizeBasedTryOn/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_female_short-pant_{person_index:02}_garment.npy')
 
     find_closest_vertices(vertices_cloth)
 

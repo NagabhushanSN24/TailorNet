@@ -21,12 +21,13 @@ OUT_PATH = "/mnt/zfs/ml-ab-team/nagabhushan/01_SizeBasedTryOn/workspace/clothing
 def get_single_frame_inputs(garment_class, gender):
     """Prepare some individual frame inputs."""
     betas = [
+        get_specific_shape('tallthin'),
+        get_specific_shape('shortfat'),
         get_specific_shape('mean'),
-        get_specific_shape('mean'),
-        get_specific_shape('mean'),
-        get_specific_shape('mean'),
-        get_specific_shape('mean'),
+        get_specific_shape('somethin'),
+        get_specific_shape('somefat'),
     ]
+    betas = [get_specific_shape('mean')] * 25
     # old t-shirt style parameters are centered around [1.5, 0.5, 1.5, 0.0]
     # whereas all other garments styles are centered around [0, 0, 0, 0]
     if garment_class == 'old-t-shirt':
@@ -45,13 +46,16 @@ def get_single_frame_inputs(garment_class, gender):
             get_style('003', garment_class=garment_class, gender=gender),
             get_style('004', garment_class=garment_class, gender=gender),
         ]
+        gammas = [get_style(f'{i:03}', garment_class=garment_class, gender=gender) for i in range(25)]
+
     thetas = [
         get_specific_pose(0),
-        get_specific_pose(0),
-        get_specific_pose(0),
-        get_specific_pose(0),
-        get_specific_pose(0),
+        get_specific_pose(1),
+        get_specific_pose(2),
+        get_specific_pose(3),
+        get_specific_pose(4),
     ]
+    thetas = [get_specific_pose(0)] * 25
     return thetas, betas, gammas
 
 
@@ -104,8 +108,8 @@ def run_tailornet():
         body, pred_gar, body_gar = smpl.run(beta=beta, theta=theta, garment_class=garment_class, garment_d=pred_verts_d)
         pred_gar = remove_interpenetration_fast(pred_gar, body)
 
-        np.save(f'vertices_{gender}_{garment_class}_{i:02}_garment.npy', pred_gar.v)
-        np.save(f'vertices_{gender}_{garment_class}_{i:02}_body_garment.npy', body_gar.v)
+        np.save(os.path.join(OUT_PATH, f'model_data/vertices_{gender}_{garment_class}_{i:02}_garment.npy'), pred_gar.v)
+        np.save(os.path.join(OUT_PATH, f'model_data/vertices_{gender}_{garment_class}_{i:02}_body_garment.npy'), body_gar.v)
 
         # save body and predicted garment
         body.write_ply(os.path.join(OUT_PATH, "body_{:04d}.ply".format(i)))
