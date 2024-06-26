@@ -140,18 +140,24 @@ class TorchSMPL4Garment(nn.Module):
                 v_skirt = v_skirt[:, :, :3, 0]
                 if ret_skirt_skinning:
                     return v_body, v_skirt, skirt_T, v_skirt_base
-                return v_body, v_skirt
-
-            v_posed_homo = torch.cat([
-                v_deformed,
-                torch.ones(num_batch, v_deformed.shape[1], 1, device=self.cur_device)], dim=2)
-            v_homo = torch.matmul(T, torch.unsqueeze(v_posed_homo, -1))
-            v_garment = v_homo[:, :, :3, 0]
-            f_garment = self.class_info[garment_class]['f']
-            body_m = Mesh(v=v_body.detach().cpu().numpy()[0], f=self.faces)
-            garment_m = Mesh(v=v_garment.detach().cpu().numpy()[0, self.class_info[garment_class]['vert_indices'].detach().cpu().numpy()], f=f_garment.detach().cpu().numpy())
-            body_garment_m = Mesh(v=v_garment.detach().cpu().numpy()[0], f=self.faces)
-            return body_m, garment_m, body_garment_m
+                f_skirt = self.class_info[garment_class]['f']
+                v_body_skirt = v_posed.clone()
+                v_body_skirt[:, self.class_info[garment_class]['vert_indices']] = v_skirt
+                body_m = Mesh(v=v_body.detach().cpu().numpy()[0], f=self.faces)
+                garment_m = Mesh(v=v_skirt.detach().cpu().numpy()[0], f=f_skirt.detach().cpu().numpy())
+                body_garment_m = Mesh(v=v_body_skirt.detach().cpu().numpy()[0], f=self.faces)
+                return body_m, garment_m, body_garment_m
+            else:
+                v_posed_homo = torch.cat([
+                    v_deformed,
+                    torch.ones(num_batch, v_deformed.shape[1], 1, device=self.cur_device)], dim=2)
+                v_homo = torch.matmul(T, torch.unsqueeze(v_posed_homo, -1))
+                v_garment = v_homo[:, :, :3, 0]
+                f_garment = self.class_info[garment_class]['f']
+                body_m = Mesh(v=v_body.detach().cpu().numpy()[0], f=self.faces)
+                garment_m = Mesh(v=v_garment.detach().cpu().numpy()[0, self.class_info[garment_class]['vert_indices'].detach().cpu().numpy()], f=f_garment.detach().cpu().numpy())
+                body_garment_m = Mesh(v=v_garment.detach().cpu().numpy()[0], f=self.faces)
+                return body_m, garment_m, body_garment_m
         else:
             return v_body
 

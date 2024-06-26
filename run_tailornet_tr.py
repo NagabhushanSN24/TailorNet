@@ -36,7 +36,11 @@ def get_single_frame_inputs(garment_class, gender):
             get_specific_style_old_tshirt('big'),
             get_specific_style_old_tshirt('small'),
             get_specific_style_old_tshirt('shortsleeve'),
+            get_specific_style_old_tshirt('longsleeve'),
+            get_specific_style_old_tshirt('small_shortsleeve'),
+            get_specific_style_old_tshirt('small_longsleeve'),
             get_specific_style_old_tshirt('big_shortsleeve'),
+            get_specific_style_old_tshirt('big_longsleeve'),
         ]
     else:
         gammas = [
