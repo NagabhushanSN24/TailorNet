@@ -14,8 +14,15 @@ this_filename = this_filepath.stem
 
 
 def find_closest_vertices(x: numpy.ndarray):
-    top_vertex_indices = [591, 593, 594, 2390, 2391, 2393, 2397, 2398, 2402, 2403]
-    bottom_vertex_indices = [1023, 1022, 970, 971, 972, 973, 974, 2075, 2020, 2019, 2021, 2022]
+    # t-shirt
+    # top_vertex_indices = [189, 190, 191, 118, 736]
+    # bottom_vertex_indices = [899, 900, 902, 566, 567, 906, 482, 258, ]
+    top_vertex_indices = [4876, 4877, 5209, 5210, 5136, 6300, 6301]
+    bottom_vertex_indices = [1299, 1258, 1300, 5463, 5466, 5987, 6269]
+
+    # # short-pant
+    # top_vertex_indices = [591, 593, 594, 2390, 2391, 2393, 2397, 2398, 2402, 2403]
+    # bottom_vertex_indices = [1023, 1022, 970, 971, 972, 973, 974, 2075, 2020, 2019, 2021, 2022]
 
     top_vertices = x[top_vertex_indices]
     bottom_vertices = x[bottom_vertex_indices]
@@ -30,9 +37,12 @@ def find_closest_vertices(x: numpy.ndarray):
     top_vertex_index = top_vertex_indices[top_vertex_id]
     bottom_vertex_index = bottom_vertex_indices[bottom_vertex_id]
 
+    top_vertex_index, bottom_vertex_index = 6300, 1299
+
     print(f'top vertex index: {top_vertex_index}; top_vertex: {x[top_vertex_index]}')
     print(f'bottom vertex index: {bottom_vertex_index}; bottom_vertex: {x[bottom_vertex_index]}')
     print(f'length: {x[top_vertex_index][1] - x[bottom_vertex_index][1]}')
+    print(f'distance: {numpy.linalg.norm(x[top_vertex_index] - x[bottom_vertex_index])}')
     return
 
 
@@ -40,24 +50,17 @@ def main():
     show_vertex_index = True
 
     # Full body vertices before adding garment offsets
-    vertices_body01 = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_body01.npy')
+    vertices_body01 = numpy.load('../../runs/testing/test0004/model_data/vertices_body01.npy')
     # Full body vertices after adding garment offsets
-    vertices_body02 = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_body02.npy')
+    vertices_body02 = numpy.load('../../runs/testing/test0006/model_data/vertices_female_t-shirt_00_body_garment.npy')
     # Full body vertices after removing garment offsets
-    vertices_body03 = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_body03.npy')
+    vertices_body03 = numpy.load('../../runs/testing/test0004/model_data/vertices_body03.npy')
     # Garment vertices before adding garment offsets
-    vertices_cloth01 = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_cloth01.npy')
+    vertices_cloth01 = numpy.load('../../runs/testing/test0006/model_data/vertices_female_t-shirt_00_garment.npy')
     # Garment vertices after adding garment offsets
-    vertices_cloth02 = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/vertices_cloth02.npy')
-    faces_body = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/faces_body.npy')
-    faces_cloth = numpy.load(
-        '/workspace/clothing_humans/literature/001_TailorNet/runs/testing/test0004/model_data/faces_cloth.npy')
+    vertices_cloth02 = numpy.load('../../runs/testing/test0004/model_data/vertices_cloth02.npy')
+    faces_body = numpy.load('../../runs/testing/test0004/model_data/faces_body.npy')
+    faces_cloth = numpy.load('../../runs/testing/test0004/model_data/faces_cloth.npy')
 
     find_closest_vertices(vertices_cloth01)
 
